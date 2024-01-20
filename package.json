@@ -2,9 +2,9 @@
   "name": "your-package-name",
   "version": "1.0.0",
   "type": "commonjs",
-  "main": "index.js",
+  "main": "Index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node Index.js"
   },
   "dependencies": {
     "discord.js": "^14.14.1",
