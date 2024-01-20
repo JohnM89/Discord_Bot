@@ -1,16 +1,16 @@
-
-
 var dotenvResult = require('dotenv').config();
 const config = require('./config.json');
 const { Client, GatewayIntentBits, IntentsBitField, REST, Routes } = require('discord.js');
 const fetch = require('node-fetch');
-const messageHistory = {}; // Stores message history for each channel
+const express = require('express'); // Import Express.js
+const app = express(); // Create an Express app
+const port = process.env.PORT || 3000; // Use the PORT environment variable if available, or use port 3000 as a fallback
 
+const messageHistory = {}; // Stores message history for each channel
 
 // OpenAI API configuration
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 const OPENAI_API_KEY = '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'; // Make sure to have your API key in an environment variable
-
 
 // Define commands array
 const commands = [
@@ -19,7 +19,6 @@ const commands = [
         description: 'Replies with Pong!',
     },
 ];
-
 
 // Create a new REST instance
 const rest = new REST({ version: '10' }).setToken(config.token);
@@ -32,13 +31,9 @@ myIntents.add(
     IntentsBitField.Flags.MessageContent,
     IntentsBitField.Flags.GuildMembers,
     IntentsBitField.Flags.DirectMessages
-    
 );
 
-
 const client = new Client({ intents: myIntents });
-
-
 
 async function fetchGPTResponse(channelId, currentMessage) {
     const historyMessages = messageHistory[channelId] || [];
@@ -74,10 +69,7 @@ async function fetchGPTResponse(channelId, currentMessage) {
     }
 }
 
-
 let lastReplyTime = {}; // Stores the last reply time for each channel
-
-
 
 // Modify the message event listener to use fetchGPTResponse
 client.on('messageCreate', async message => {
@@ -99,7 +91,7 @@ client.on('messageCreate', async message => {
         messageHistory[message.channel.id].shift();
     }
 
-     const lowerCaseMessage = message.content.toLowerCase();
+    const lowerCaseMessage = message.content.toLowerCase();
 
     // Check for specific triggers and reply accordingly
     if (lowerCaseMessage === 'hello') {
@@ -125,11 +117,7 @@ client.on('messageCreate', async message => {
     }
 });
 
-
-
-
-
-//Joke Generator 
+// Joke Generator
 const jokes = [
     "Why don't skeletons fight each other? They don't have the guts.",
     "What do you call an alligator in a vest? An investigator!",
@@ -143,11 +131,7 @@ client.on('messageCreate', message => {
     }
 });
 
-
-
-
-
-//poll creation
+// Poll creation
 client.on('messageCreate', async message => {
     
     if (message.content.toLowerCase().startsWith('create poll')) {
@@ -157,9 +141,6 @@ client.on('messageCreate', async message => {
         await pollMessage.react('👎');
     }
 });
-
-
-// 
 
 // Register an interactionCreate event listener
 client.on('interactionCreate', async interaction => {
@@ -187,6 +168,11 @@ async function startBot() {
 
     // Log in to Discord with your bot's token
     await client.login(config.token);
+
+    // Start the Express.js web server
+    app.listen(port, () => {
+        console.log(`Server is running on port ${port}`);
+    });
 }
 
 // Start the bot
