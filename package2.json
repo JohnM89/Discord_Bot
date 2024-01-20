@@ -1,0 +1,13 @@
+{
+  "name": "your-package-name",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "main": "index22.js",
+  "scripts": {
+    "start": "node index22.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.14.1",
+    "node-fetch": "^2.7.0"
+  }
+}
