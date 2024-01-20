@@ -9,7 +9,7 @@ const messageHistory = {}; // Stores message history for each channel
 
 // OpenAI API configuration
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
-const OPENAI_API_KEY = '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'; // Make sure to have your API key in an environment variable
+const OPENAI_API_KEY = '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'; // Make sure to have your API key in an environment variable
 
 
 // Define commands array
