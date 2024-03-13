@@ -2,17 +2,16 @@ var dotenvResult = require('dotenv').config();
 const config = require('./config.json');
 const { Client, GatewayIntentBits, IntentsBitField, REST, Routes } = require('discord.js');
 const fetch = require('node-fetch');
-const express = require('express'); // Import Express.js
-const app = express(); // Create an Express app
-const port = process.env.PORT || 3000; // Use the PORT environment variable if available, or use port 3000 as a fallback
+const express = require('express'); 
+const app = express(); 
+const port = process.env.PORT || 3000; 
 
-const messageHistory = {}; // Stores message history for each channel
+const messageHistory = {}; 
 
-// OpenAI API configuration
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 const OPENAI_API_KEY = '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'; // Make sure to have your API key in an environment variable
 
-// Define commands array
+
 const commands = [
     {
         name: 'ping',
@@ -20,10 +19,10 @@ const commands = [
     },
 ];
 
-// Create a new REST instance
+
 const rest = new REST({ version: '10' }).setToken(config.token);
 
-// Create a new client instance
+// create a new client instance
 const myIntents = new IntentsBitField();
 myIntents.add(
     IntentsBitField.Flags.Guilds,
@@ -37,9 +36,9 @@ const client = new Client({ intents: myIntents });
 
 async function fetchGPTResponse(channelId, currentMessage) {
     const historyMessages = messageHistory[channelId] || [];
-    const characterReminder = "respond as concise as possible"; // Character reminder
+    const characterReminder = "respond as concise as possible"; // Character reminder!
 
-    // Prepend character reminder to the history
+    // prepend character reminder to the history
     const prompt = [
         { role: "system", content: characterReminder },
         ...historyMessages,
@@ -69,20 +68,20 @@ async function fetchGPTResponse(channelId, currentMessage) {
     }
 }
 
-let lastReplyTime = {}; // Stores the last reply time for each channel
+let lastReplyTime = {}; 
 
-// Modify the message event listener to use fetchGPTResponse
+
 client.on('messageCreate', async message => {
     if (message.author.bot) return;
 
-    // Rate limiting - only respond if sufficient time has passed
+  // rate limiting
     const currentTime = Date.now();
     const timeSinceLastReply = currentTime - (lastReplyTime[message.channel.id] || 0);
     if (timeSinceLastReply < 5000) { // 5 seconds cooldown
         return;
     }
 
-    // Update message history for the channel
+   
     if (!messageHistory[message.channel.id]) {
         messageHistory[message.channel.id] = [];
     }
@@ -93,18 +92,18 @@ client.on('messageCreate', async message => {
 
     const lowerCaseMessage = message.content.toLowerCase();
 
-    // Check for specific triggers and reply accordingly
+    // check for triggers and reply accordingly
     if (lowerCaseMessage === 'hello') {
         message.reply("Hey there, how's it goin'!");
     } else {
-        // Use the updated fetchGPTResponse function for other triggers
+        // use the updated fetchGPTResponse function for other triggers
         const triggers = ['jim', 'who', 'what', 'where', 'when', 'why', 'give', 'make', 'tell' ,'can'];
         const trigger = triggers.find(t => lowerCaseMessage.includes(t));
 
         if (trigger) {
             const response = await fetchGPTResponse(message.channel.id, lowerCaseMessage);
             if (response.length > 2000) {
-                // Split and send long responses
+                // split and send long responses
                 const maxCharacters = 2000;
                 for (let i = 0; i < response.length; i += maxCharacters) {
                     const messageChunk = response.substring(i, Math.min(response.length, i + maxCharacters));
@@ -117,7 +116,7 @@ client.on('messageCreate', async message => {
     }
 });
 
-// Joke Generator
+// joke generator
 const jokes = [
     "Why don't skeletons fight each other? They don't have the guts.",
     "What do you call an alligator in a vest? An investigator!",
@@ -131,7 +130,7 @@ client.on('messageCreate', message => {
     }
 });
 
-// Poll creation
+// poll creation
 client.on('messageCreate', async message => {
     
     if (message.content.toLowerCase().startsWith('create poll')) {
@@ -142,7 +141,7 @@ client.on('messageCreate', async message => {
     }
 });
 
-// Register an interactionCreate event listener
+// register an interactionCreate event listener
 client.on('interactionCreate', async interaction => {
     if (!interaction.isCommand()) return;
 
@@ -151,7 +150,7 @@ client.on('interactionCreate', async interaction => {
     }
 });
 
-// Function to refresh application commands and login to Discord
+// function to refresh application commands and login to Discord
 async function startBot() {
     try {
         console.log('Started refreshing application (/) commands.');
@@ -166,14 +165,14 @@ async function startBot() {
         console.error(error);
     }
 
-    // Log in to Discord with your bot's token
+    // login to discord
     await client.login(config.token);
 
-    // Start the Express.js web server
+    
     app.listen(port, () => {
         console.log(`Server is running on port ${port}`);
     });
 }
 
-// Start the bot
+
 startBot();
