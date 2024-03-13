@@ -24,7 +24,7 @@ npm install
 4. **Run the Bot**
 
 ## 🎮 How to Use
-- Type `!chat` followed by your message to start a conversation.
+- Type `!chat`,`who, what, where, when & why` or `bot name` followed by your message to start a conversation.
 - Discover more with `!help`.
 
 ## 🤝 Contributing
